@@ -37,7 +37,7 @@ func (w *Watcher) Start() {
 					return errors.New("nil directory!")
 				}
 				if info.IsDir() {
-					if len(path) > 1 && strings.HasPrefix(filepath.Base(path), ".") || w.isIgnoredFolder(path) {
+					if len(path) > 1 && strings.HasPrefix(filepath.Base(path), ".") || w.isIgnoredFolder(path, info) {
 						return filepath.SkipDir
 					}
 				}
@@ -57,14 +57,9 @@ func (w *Watcher) Start() {
 	}()
 }
 
-func (w Watcher) isIgnoredFolder(path string) bool {
-	paths := strings.Split(path, "/")
-	if len(paths) <= 0 {
-		return false
-	}
-
+func (w Watcher) isIgnoredFolder(path string, info os.FileInfo) bool {
 	for _, e := range w.IgnoredFolders {
-		if strings.TrimSpace(e) == paths[0] {
+		if info.IsDir() && info.Name() == strings.TrimSpace(e) {
 			return true
 		}
 	}
